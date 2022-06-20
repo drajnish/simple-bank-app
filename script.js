@@ -42,9 +42,15 @@ const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
 
 const btnLogin = document.querySelector('.login__btn');
+const btnTransfer = document.querySelector('.form__btn--transfer');
+const btnClose = document.querySelector('.form__btn--close');
 
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
+const inputTransferTo = document.querySelector('.form__input--to');
+const inputTransferAmount = document.querySelector('.form__input--amount');
+const inputCloseUsername = document.querySelector('.form__input--user');
+const inputClosePin = document.querySelector('.form__input--pin');
 
 // calculations
 
@@ -65,10 +71,10 @@ const displayMovements = function (movements) {
   });
 };
 
-const calcDisplayBalance = movements => {
-  const balance = movements.reduce((acc, curr) => acc + curr, 0);
+const calcDisplayBalance = acc => {
+  acc.balance = Number(acc.movements.reduce((acc, curr) => acc + curr, 0));
 
-  labelBalance.textContent = `₹ ${balance}`;
+  labelBalance.textContent = `₹ ${acc.balance}`;
 };
 
 const calcDisplaySummary = account => {
@@ -108,6 +114,18 @@ const createUsernames = accs => {
 
 createUsernames(accounts);
 
+// update ui
+const updateUI = acc => {
+  // display balance
+  calcDisplayBalance(acc);
+
+  // display Movements
+  displayMovements(acc.movements);
+
+  // display Summary
+  calcDisplaySummary(acc);
+};
+
 // Event Handler
 
 let currentAccount;
@@ -131,13 +149,52 @@ btnLogin.addEventListener('click', e => {
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
-    // display balance
-    calcDisplayBalance(currentAccount.movements);
-
-    // display Movements
-    displayMovements(currentAccount.movements);
-
-    // display Summary
-    calcDisplaySummary(currentAccount);
+    updateUI(currentAccount);
   }
+});
+
+// transfer btn event
+btnTransfer.addEventListener('click', e => {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+
+  // clear transfer money input field
+  inputTransferAmount.value = inputTransferTo.value = '';
+
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= amount &&
+    receiverAcc.username !== currentAccount.username
+  ) {
+    // transfer from one acc to another acc
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    // update ui
+    updateUI(currentAccount);
+  }
+});
+
+// close btn event
+btnClose.addEventListener('click', e => {
+  e.preventDefault();
+
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const userIndex = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+
+    accounts.splice(userIndex, 1);
+
+    containerApp.style.opacity = 0;
+  }
+
+  inputCloseUsername.value = inputClosePin.value = '';
 });
