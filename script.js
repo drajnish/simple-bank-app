@@ -43,12 +43,14 @@ const containerMovements = document.querySelector('.movements');
 
 const btnLogin = document.querySelector('.login__btn');
 const btnTransfer = document.querySelector('.form__btn--transfer');
+const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
 
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
 const inputTransferTo = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
+const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
@@ -177,6 +179,24 @@ btnTransfer.addEventListener('click', e => {
     // update ui
     updateUI(currentAccount);
   }
+});
+
+// loan btn event
+btnLoan.addEventListener('click', e => {
+  e.preventDefault();
+
+  const loanAmount = Number(inputLoanAmount.value);
+  const loanCondition = currentAccount.movements.some(
+    mov => mov >= loanAmount * 0.1
+  );
+
+  if (loanAmount > 0 && loanCondition) {
+    currentAccount.movements.push(loanAmount);
+
+    updateUI(currentAccount);
+  }
+
+  inputLoanAmount.value = '';
 });
 
 // close btn event
