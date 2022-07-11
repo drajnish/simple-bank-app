@@ -106,6 +106,7 @@ const calcDisplaySummary = account => {
   labelSumInterest.textContent = `${interst} ₹`;
 };
 
+// crate user name
 const createUsernames = accs => {
   accs.forEach(
     acc =>
